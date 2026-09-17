@@ -1044,7 +1044,7 @@ html&gt;body{padding:0}&lt;/style&gt;
     #gmm-em-lab .gel-controls{display:flex;gap:10px 16px;align-items:end;flex-wrap:wrap;margin:0 0 14px}
     #gmm-em-lab .gel-controls label{display:grid;gap:3px;min-width:125px}
     #gmm-em-lab .gel-controls .gel-actions{display:flex;gap:7px;flex-wrap:wrap}
-    #gmm-em-lab .gel-plot{width:100%;display:block;touch-action:manipulation}
+    #gmm-em-lab .gel-plot{width:100%;max-width:900px;display:block;margin:0 auto;touch-action:manipulation}
     #gmm-em-lab .gel-frame{fill:none;stroke:var(--border);stroke-width:1}
     #gmm-em-lab .gel-axis{stroke:var(--border);stroke-width:1}
     #gmm-em-lab .gel-tick,#gmm-em-lab .gel-axis-title,#gmm-em-lab .gel-mean-label{fill:var(--foreground);font-size:12px;font-weight:400}
@@ -1132,7 +1132,7 @@ html&gt;body{padding:0}&lt;/style&gt;
     function line(x1,y1,x2,y2,cls){return el(&#x27;line&#x27;,{x1,y1,x2,y2,class:cls})}
     function text(x,y,content,cls,extra={}){const n=el(&#x27;text&#x27;,{x,y,class:cls,...extra});n.textContent=content;return n}
     function draw(){
-      const W=Math.max(320,Math.round(svg.getBoundingClientRect().width||720)),H=W&lt;540?360:430;
+      const W=Math.max(320,Math.round(svg.getBoundingClientRect().width||720)),H=W&lt;540?360:Math.min(620,Math.round(W*.69));
       const m={left:62,right:18,top:20,bottom:58},pw=W-m.left-m.right,ph=H-m.top-m.bottom;
       svg.setAttribute(&#x27;viewBox&#x27;,`0 0 ${W} ${H}`);svg.setAttribute(&#x27;height&#x27;,H);svg.replaceChildren();
       const xs=state.data.map(d=&gt;d.x),ys=state.data.map(d=&gt;d.y);
