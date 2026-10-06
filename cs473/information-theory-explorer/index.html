@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Information Theory Explorer — CS 473</title>
+  <meta name="description" content="Explore entropy, cross-entropy, KL divergence, perplexity, and forward versus reverse KL interactively.">
+  <style>
+    :root{color-scheme:light dark;--bg:light-dark(#f5f7fb,#0c1119);--panel:light-dark(#fff,#171e2a);--panel2:light-dark(#eef2f8,#222b3a);--text:light-dark(#182133,#edf3ff);--muted:light-dark(#5d687b,#aab6cb);--line:light-dark(#d9e0eb,#354052);--blue:light-dark(#245edb,#79a6ff);--orange:light-dark(#bd5d12,#ff9c55);--green:light-dark(#16785a,#52d2a1);--red:light-dark(#b6404d,#ff7b88);--shadow:0 12px 34px light-dark(#22304a14,#00000038)}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 10% 0,light-dark(#e6eeff,#142039) 0,transparent 34%),var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}.shell{width:min(1120px,calc(100% - 28px));margin:auto;padding:30px 0 52px}.crumbs{display:flex;gap:8px;color:var(--muted);font-size:.9rem;margin-bottom:26px}.crumbs a{color:inherit;text-decoration:none}.crumbs a:hover{text-decoration:underline}.eyebrow{text-transform:uppercase;letter-spacing:.13em;color:var(--blue);font-size:.75rem;font-weight:700}h1{font-size:clamp(2.25rem,5vw,4.25rem);letter-spacing:-.055em;line-height:1;margin:.25rem 0 .75rem}.lede{max-width:800px;color:var(--muted);font-size:1.04rem;margin:0 0 22px}.convention{border-left:3px solid var(--orange);background:var(--panel2);padding:10px 13px;border-radius:0 10px 10px 0;margin-bottom:20px;font-size:.88rem}.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}.tab{border:1px solid var(--line);background:var(--panel);color:var(--text);padding:10px 14px;border-radius:10px;cursor:pointer}.tab[aria-selected="true"]{background:var(--text);color:var(--bg);border-color:var(--text)}.panel{background:var(--panel);border:1px solid var(--line);border-radius:17px;box-shadow:var(--shadow)}.tab-panel[hidden]{display:none}.lab-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);gap:16px}.chart-panel{padding:18px}.chart-head{display:flex;justify-content:space-between;gap:12px;align-items:baseline;margin-bottom:6px}.chart-head h2,.side h2,.quiz h2{font-size:1.2rem;margin:0}.chart-head span{color:var(--muted);font-size:.8rem}.density-svg{width:100%;height:auto;display:block}.axis{stroke:var(--line);stroke-width:1}.grid{stroke:var(--line);stroke-width:1;opacity:.5}.axis-text{fill:var(--muted);font-size:11px}.axis-title{fill:var(--text);font-size:12px}.p-area{fill:var(--blue);opacity:.16}.p-line{fill:none;stroke:var(--blue);stroke-width:3}.q-area{fill:var(--orange);opacity:.13}.q-line{fill:none;stroke:var(--orange);stroke-width:3}.legend{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:.8rem;margin-top:5px}.key{display:inline-block;width:18px;height:3px;margin:0 6px 3px 0}.key.p{background:var(--blue)}.key.q{background:var(--orange)}.side{padding:18px}.presets{display:grid;grid-template-columns:1fr;gap:8px;margin:12px 0 17px}.preset{border:1px solid var(--line);border-radius:10px;background:var(--panel2);color:var(--text);padding:10px 12px;text-align:left;cursor:pointer}.preset:hover{border-color:var(--blue)}.control{margin:13px 0}.control-row{display:flex;justify-content:space-between;gap:12px;font-size:.84rem;margin-bottom:4px}.control-row span:first-child{color:var(--muted)}input[type=range]{width:100%;accent-color:var(--orange)}.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:15px}.metric{background:var(--panel2);border-radius:11px;padding:11px}.metric span{display:block;font-size:.72rem;color:var(--muted)}.metric strong{display:block;font-size:1.25rem;font-variant-numeric:tabular-nums}.explain{margin-top:14px;padding:12px;border-left:3px solid var(--blue);background:var(--panel2);border-radius:0 10px 10px 0;font-size:.88rem;color:var(--muted)}.explain strong{color:var(--text)}.formula-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}.formula{padding:14px}.formula b{display:block;font-size:.84rem;margin-bottom:4px}.formula code{display:block;color:var(--blue);font-size:.9rem;white-space:normal}.formula p{font-size:.78rem;color:var(--muted);margin:5px 0 0}.discrete-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);gap:16px}.bars-panel,.controls-panel{padding:18px}.bars-panel h2,.controls-panel h2{font-size:1.2rem;margin:0 0 5px}.sub{color:var(--muted);font-size:.85rem;margin:0 0 12px}.bar-chart{display:grid;grid-template-columns:repeat(4,1fr);height:270px;align-items:end;gap:14px;border-bottom:1px solid var(--line);padding:16px 12px 0}.bar-group{height:100%;display:flex;align-items:flex-end;justify-content:center;gap:4px;position:relative}.bar{width:30%;min-width:12px;border-radius:6px 6px 0 0;transition:height .18s ease}.bar.p{background:var(--blue)}.bar.q{background:var(--orange)}.bar-label{position:absolute;bottom:-27px;left:0;right:0;text-align:center;color:var(--muted);font-size:.78rem}.bar-value{position:absolute;font-size:.68rem;transform:translateY(-5px);color:var(--muted)}.bar-value.pv{left:5%}.bar-value.qv{right:4%}.bar-legend{margin:38px 0 0}.select-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}select{width:100%;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:9px;padding:9px}.outcome-controls{display:grid;gap:9px;margin-top:14px}.outcome-control .control-row{margin:0}.identity{margin-top:15px;background:var(--panel2);border-radius:11px;padding:12px;text-align:center}.identity code{color:var(--green);font-size:.92rem}.definition-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px}.definition{padding:15px}.definition h3{font-size:.95rem;margin:0 0 5px}.definition code{color:var(--blue);font-size:.82rem}.definition p{font-size:.8rem;color:var(--muted);margin:5px 0 0}.quiz{max-width:820px;margin:auto}.quiz-intro{color:var(--muted);margin:5px 0 18px}.question{padding:18px;margin-bottom:12px}.question h3{font-size:1rem;margin:0 0 10px}.options{display:grid;gap:7px}.option{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:10px 12px;border-radius:9px;text-align:left;cursor:pointer}.option:hover{border-color:var(--blue)}.option.correct{border-color:var(--green);background:color-mix(in srgb,var(--green) 12%,var(--panel))}.option.wrong{border-color:var(--red);background:color-mix(in srgb,var(--red) 10%,var(--panel))}.feedback{min-height:24px;font-size:.85rem;color:var(--muted);margin-top:8px}.score{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:16px;margin-top:14px}.score strong{font-size:1.2rem}.reset{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:9px 13px;border-radius:9px;cursor:pointer}.footer-note{text-align:center;color:var(--muted);font-size:.79rem;margin-top:18px}@media(max-width:820px){.lab-grid,.discrete-grid{grid-template-columns:1fr}.formula-strip{grid-template-columns:1fr}.definition-grid{grid-template-columns:1fr}}@media(max-width:520px){.shell{width:min(100% - 18px,1120px);padding-top:20px}.chart-panel,.side,.bars-panel,.controls-panel,.question{padding:14px}.metric-grid{grid-template-columns:1fr 1fr}.select-row{grid-template-columns:1fr}.bar-chart{gap:7px;padding-left:4px;padding-right:4px}.tabs{display:grid;grid-template-columns:1fr}.score{align-items:flex-start;flex-direction:column}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><a href="../">CS 473</a><span>›</span><span>Information theory</span></nav>
+    <div class="eyebrow">Information theory</div>
+    <h1>Entropy &amp; KL Explorer</h1>
+    <p class="lede">See what forward and reverse KL ask an approximation to do, then connect entropy, cross-entropy, KL divergence, conditional entropy, and perplexity.</p>
+    <div class="convention"><strong>Convention used here:</strong> forward KL means D<sub>KL</sub>(p‖q), so q is pushed to cover p. Reverse KL means D<sub>KL</sub>(q‖p), so q is pushed to stay where p has support. Some authors swap the names, so always check the formula.</div>
+
+    <div class="tabs" role="tablist" aria-label="Explorer sections">
+      <button class="tab" role="tab" aria-selected="true" aria-controls="kl-panel" id="kl-tab">Forward vs reverse KL</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="entropy-panel" id="entropy-tab">Entropy calculator</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="quiz-panel" id="quiz-tab">Knowledge check</button>
+    </div>
+
+    <section id="kl-panel" class="tab-panel" role="tabpanel" aria-labelledby="kl-tab">
+      <div class="lab-grid">
+        <div class="panel chart-panel">
+          <div class="chart-head"><h2>Approximate a two-mode target</h2><span>Target p is fixed; Gaussian q is adjustable</span></div>
+          <svg id="density-chart" class="density-svg" viewBox="0 0 690 360" role="img" aria-label="Target bimodal distribution p and adjustable Gaussian approximation q"></svg>
+          <div class="legend"><span><i class="key p"></i>Target p(x)</span><span><i class="key q"></i>Approximation q(x)</span></div>
+        </div>
+        <aside class="panel side">
+          <h2>Choose what q should optimize</h2>
+          <div class="presets">
+            <button class="preset" data-fit="forward"><strong>Forward KL · cover p</strong><br><small>Broad q spans both modes</small></button>
+            <button class="preset" data-fit="reverse-left"><strong>Reverse KL · fit left mode</strong><br><small>Narrow q avoids the low-density gap</small></button>
+            <button class="preset" data-fit="reverse-right"><strong>Reverse KL · fit right mode</strong><br><small>The other equally good mode-seeking answer</small></button>
+          </div>
+          <div class="control"><div class="control-row"><span>q mean μ</span><strong id="mu-value">0.00</strong></div><input id="mu" type="range" min="-4" max="4" value="0" step="0.05"></div>
+          <div class="control"><div class="control-row"><span>q standard deviation σ</span><strong id="sigma-value">2.25</strong></div><input id="sigma" type="range" min="0.25" max="3.5" value="2.25" step="0.05"></div>
+          <div class="metric-grid" aria-live="polite">
+            <div class="metric"><span>Forward KL · p‖q</span><strong id="forward-value">—</strong></div>
+            <div class="metric"><span>Reverse KL · q‖p</span><strong id="reverse-value">—</strong></div>
+          </div>
+          <div class="explain" id="kl-explanation"></div>
+        </aside>
+      </div>
+      <div class="formula-strip">
+        <div class="panel formula"><b>Forward KL</b><code>D<sub>KL</sub>(p‖q) = E<sub>p</sub>[log p/q]</code><p>Samples from p expose places q failed to cover.</p></div>
+        <div class="panel formula"><b>Reverse KL</b><code>D<sub>KL</sub>(q‖p) = E<sub>q</sub>[log q/p]</code><p>Samples from q punish q for entering places p considers unlikely.</p></div>
+        <div class="panel formula"><b>Gaussian special case</b><code>KL(N₀‖N₁)=½[σ₀²/σ₁² +(μ₁−μ₀)²/σ₁² −1+ln(σ₁²/σ₀²)]</code><p>This closed form is for one-dimensional Gaussians.</p></div>
+      </div>
+    </section>
+
+    <section id="entropy-panel" class="tab-panel" role="tabpanel" aria-labelledby="entropy-tab" hidden>
+      <div class="discrete-grid">
+        <div class="panel bars-panel">
+          <h2>Discrete distributions P and Q</h2>
+          <p class="sub">P is the true distribution. Q is the model or code you use to represent it.</p>
+          <div class="bar-chart" id="bar-chart" aria-label="Bar chart comparing distributions P and Q"></div>
+          <div class="legend bar-legend"><span><i class="key p"></i>True P</span><span><i class="key q"></i>Model Q</span></div>
+        </div>
+        <aside class="panel controls-panel">
+          <h2>Change the distributions</h2>
+          <div class="select-row">
+            <label>Preset P<select id="p-preset"><option value="uniform">Uniform</option><option value="peaked" selected>Peaked</option><option value="rare">Rare event</option></select></label>
+            <label>Preset Q<select id="q-preset"><option value="match">Match P</option><option value="uniform" selected>Uniform</option><option value="wrong">Confident but wrong</option></select></label>
+          </div>
+          <div class="outcome-controls" id="q-controls"></div>
+          <div class="metric-grid" aria-live="polite">
+            <div class="metric"><span>Entropy H(P)</span><strong id="entropy-value">—</strong></div>
+            <div class="metric"><span>Cross-entropy H(P,Q)</span><strong id="cross-value">—</strong></div>
+            <div class="metric"><span>KL(P‖Q)</span><strong id="discrete-kl-value">—</strong></div>
+            <div class="metric"><span>Perplexity 2ᴴ</span><strong id="perplexity-value">—</strong></div>
+          </div>
+          <div class="identity"><code>Cross-entropy = Entropy + KL</code><br><span id="identity-values"></span></div>
+        </aside>
+      </div>
+      <div class="definition-grid">
+        <div class="panel definition"><h3>Entropy</h3><code>H(X)=−Σ p(x) log₂p(x)</code><p>Average uncertainty, or optimal average bits needed to encode outcomes from P.</p></div>
+        <div class="panel definition"><h3>Cross-entropy</h3><code>H(P,Q)=−Σ p(x) log₂q(x)</code><p>Average bits used when data comes from P but your code/model assumes Q.</p></div>
+        <div class="panel definition"><h3>Joint and conditional entropy</h3><code>H(X,Y)=H(X)+H(Y|X)</code><p>Joint uncertainty equals uncertainty in X plus uncertainty left in Y after X is known.</p></div>
+        <div class="panel definition"><h3>Perplexity</h3><code>PP(P)=2ᴴ⁽ᴾ⁾</code><p>The effective number of equally likely choices. Lower is better only when comparing models on the same data.</p></div>
+        <div class="panel definition"><h3>KL divergence</h3><code>D<sub>KL</sub>(P‖Q)=Σp log₂(p/q)≥0</code><p>Extra bits caused by using Q instead of P. It is zero only when P=Q, and it is not symmetric.</p></div>
+        <div class="panel definition"><h3>KL and maximum likelihood</h3><code>argmax E<sub>P</sub>[log Qθ] = argmin KL(P‖Qθ)</code><p>Maximum likelihood fits Q by minimizing forward KL from the data distribution to the model.</p></div>
+      </div>
+    </section>
+
+    <section id="quiz-panel" class="tab-panel quiz" role="tabpanel" aria-labelledby="quiz-tab" hidden>
+      <h2>Check your understanding</h2>
+      <p class="quiz-intro">Choose one answer for each question. Feedback appears immediately.</p>
+      <div id="questions"></div>
+      <div class="panel score"><strong id="score-text">Score: 0 / 5</strong><button class="reset" id="reset-quiz" type="button">Reset quiz</button></div>
+    </section>
+    <p class="footer-note">All logarithms in the discrete calculator use base 2, so entropy and divergence are measured in bits.</p>
+  </main>
+
+  <script>
+    const $=id=>document.getElementById(id);
+    document.querySelectorAll('.tab').forEach(tab=>tab.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',String(t===tab)));document.querySelectorAll('.tab-panel').forEach(p=>p.hidden=p.id!==tab.getAttribute('aria-controls'))}));
+
+    const normal=(x,m,s)=>Math.exp(-.5*((x-m)/s)**2)/(s*Math.sqrt(2*Math.PI));
+    const target=x=>.5*normal(x,-2,.65)+.5*normal(x,2,.65);
+    let mu=0,sigma=2.25;
+    function integrate(fn){let sum=0,step=.02;for(let x=-7;x<=7;x+=step)sum+=fn(x)*step;return sum}
+    function kls(){const eps=1e-12;return{forward:integrate(x=>{const p=target(x),q=normal(x,mu,sigma);return p*Math.log((p+eps)/(q+eps))}),reverse:integrate(x=>{const p=target(x),q=normal(x,mu,sigma);return q*Math.log((q+eps)/(p+eps))})}}
+    function drawDensity(){const svg=$('density-chart'),W=690,H=360,L=55,R=18,T=22,B=48,pw=W-L-R,ph=H-T-B,xmin=-6,xmax=6,ymax=.38;const X=x=>L+(x-xmin)/(xmax-xmin)*pw,Y=y=>T+ph-y/ymax*ph;let pPts=[],qPts=[];for(let x=xmin;x<=xmax+.01;x+=.06){pPts.push([X(x),Y(target(x))]);qPts.push([X(x),Y(normal(x,mu,sigma))])}const path=pts=>pts.map((d,i)=>(i?'L':'M')+d[0].toFixed(1)+','+d[1].toFixed(1)).join(' ');const area=pts=>`M${pts[0][0]},${T+ph} `+pts.map(d=>`L${d[0].toFixed(1)},${d[1].toFixed(1)}`).join(' ')+` L${pts.at(-1)[0]},${T+ph} Z`;let out='<title>Target distribution and Gaussian approximation</title><desc>The target has modes at negative two and positive two. Adjust the Gaussian mean and standard deviation.</desc>';for(let i=0;i<=6;i++){const x=xmin+i*2,px=X(x);out+=`<line class="grid" x1="${px}" y1="${T}" x2="${px}" y2="${T+ph}"/><text class="axis-text" x="${px}" y="${H-25}" text-anchor="middle">${x}</text>`}for(let i=0;i<=3;i++){const y=i*.1,py=Y(y);out+=`<line class="grid" x1="${L}" y1="${py}" x2="${L+pw}" y2="${py}"/><text class="axis-text" x="${L-8}" y="${py+4}" text-anchor="end">${y.toFixed(1)}</text>`}out+=`<path class="p-area" d="${area(pPts)}"/><path class="q-area" d="${area(qPts)}"/><path class="p-line" d="${path(pPts)}"/><path class="q-line" d="${path(qPts)}"/><line class="axis" x1="${L}" y1="${T+ph}" x2="${L+pw}" y2="${T+ph}"/><line class="axis" x1="${L}" y1="${T}" x2="${L}" y2="${T+ph}"/><text class="axis-title" x="${L+pw/2}" y="${H-4}" text-anchor="middle">x</text><text class="axis-title" transform="translate(14 ${T+ph/2}) rotate(-90)" text-anchor="middle">Probability density</text>`;svg.innerHTML=out;const d=kls();$('forward-value').textContent=d.forward.toFixed(3)+' nats';$('reverse-value').textContent=d.reverse.toFixed(3)+' nats';$('mu-value').textContent=mu.toFixed(2);$('sigma-value').textContent=sigma.toFixed(2);let msg;if(sigma>1.5&&Math.abs(mu)<1){msg='<strong>Mass-covering:</strong> q reaches both modes, preventing p from landing where q is nearly zero. It also wastes mass in the gap.'}else if(sigma<1.15&&Math.abs(mu)>1.2){msg='<strong>Mode-seeking:</strong> q stays inside one high-density region of p. It ignores the other mode instead of placing mass in the gap.'}else{msg='<strong>Tradeoff:</strong> move q and compare both numbers. The two KL directions disagree because the expectation is taken under different distributions.'}$('kl-explanation').innerHTML=msg}
+    $('mu').addEventListener('input',e=>{mu=+e.target.value;drawDensity()});$('sigma').addEventListener('input',e=>{sigma=+e.target.value;drawDensity()});document.querySelectorAll('.preset').forEach(b=>b.addEventListener('click',()=>{const f=b.dataset.fit;if(f==='forward'){mu=0;sigma=2.15}else if(f==='reverse-left'){mu=-2;sigma=.65}else{mu=2;sigma=.65}$('mu').value=mu;$('sigma').value=sigma;drawDensity()}));drawDensity();
+
+    const pPresets={uniform:[.25,.25,.25,.25],peaked:[.62,.20,.12,.06],rare:[.94,.03,.02,.01]};
+    const qPresets={uniform:[.25,.25,.25,.25],wrong:[.05,.10,.20,.65]};let P=[...pPresets.peaked],rawQ=[.25,.25,.25,.25];
+    function norm(a){const s=a.reduce((x,y)=>x+y,0);return a.map(x=>x/s)}
+    function entropy(p){return-p.reduce((s,v)=>s+(v? v*Math.log2(v):0),0)}
+    function cross(p,q){return-p.reduce((s,v,i)=>s+v*Math.log2(Math.max(q[i],1e-9)),0)}
+    function renderControls(){const labels=['A','B','C','D'];$('q-controls').innerHTML=labels.map((l,i)=>`<div class="outcome-control"><div class="control-row"><span>Q(${l}) weight</span><strong id="qv-${i}"></strong></div><input type="range" min="0.01" max="1" step="0.01" value="${rawQ[i]}" data-qi="${i}" aria-label="Q ${l} weight"></div>`).join('');document.querySelectorAll('[data-qi]').forEach(r=>r.addEventListener('input',e=>{rawQ[+e.target.dataset.qi]=+e.target.value;$('q-preset').value='custom';updateDiscrete()}))}
+    function updateDiscrete(){const Q=norm(rawQ),H=entropy(P),CE=cross(P,Q),KL=CE-H,PP=2**H,labels=['A','B','C','D'];$('bar-chart').innerHTML=labels.map((l,i)=>`<div class="bar-group"><div class="bar p" style="height:${P[i]*220}px"></div><div class="bar q" style="height:${Q[i]*220}px"></div><span class="bar-value pv" style="bottom:${P[i]*220}px">${P[i].toFixed(2)}</span><span class="bar-value qv" style="bottom:${Q[i]*220}px">${Q[i].toFixed(2)}</span><span class="bar-label">${l}</span></div>`).join('');Q.forEach((v,i)=>{$('qv-'+i).textContent=v.toFixed(3)});$('entropy-value').textContent=H.toFixed(3)+' bits';$('cross-value').textContent=CE.toFixed(3)+' bits';$('discrete-kl-value').textContent=KL.toFixed(3)+' bits';$('perplexity-value').textContent=PP.toFixed(2);$('identity-values').textContent=`${CE.toFixed(3)} = ${H.toFixed(3)} + ${KL.toFixed(3)} bits`}
+    $('p-preset').addEventListener('change',e=>{P=[...pPresets[e.target.value]];if($('q-preset').value==='match')rawQ=[...P];renderControls();updateDiscrete()});$('q-preset').addEventListener('change',e=>{rawQ=e.target.value==='match'?[...P]:[...(qPresets[e.target.value]||rawQ)];renderControls();updateDiscrete()});renderControls();updateDiscrete();
+
+    const quiz=[
+      {q:'Using the convention on this page, which objective pressures q to cover every mode of p?',a:['Dₖₗ(p‖q)','Dₖₗ(q‖p)','Entropy H(p)'],correct:0,why:'Forward KL averages under p. If p has mass where q is tiny, the penalty is large.'},
+      {q:'Cross-entropy H(P,Q) equals which expression?',a:['H(P) − KL(P‖Q)','H(P) + KL(P‖Q)','KL(Q‖P) − H(Q)'],correct:1,why:'Cross-entropy is the unavoidable entropy of P plus the extra coding cost from using Q.'},
+      {q:'Is KL divergence a distance metric?',a:['Yes, because it is nonnegative','No, because it is generally asymmetric','Yes, if probabilities sum to one'],correct:1,why:'KL is nonnegative, but KL(P‖Q) usually differs from KL(Q‖P), so it is not a metric.'},
+      {q:'If H(P)=3 bits, what is the perplexity?',a:['3','6','8'],correct:2,why:'Perplexity is 2ᴴ, so 2³ = 8 effective equally likely choices.'},
+      {q:'Which chain rule is correct?',a:['H(X,Y)=H(X)+H(Y|X)','H(X,Y)=H(X)H(Y)','H(Y|X)=H(Y)+H(X)'],correct:0,why:'Describe X first, then spend the remaining conditional bits to describe Y given X.'}
+    ];let answers=Array(quiz.length).fill(null);
+    function renderQuiz(){ $('questions').innerHTML=quiz.map((item,i)=>`<section class="panel question"><h3>${i+1}. ${item.q}</h3><div class="options">${item.a.map((a,j)=>`<button class="option ${answers[i]===null?'':j===item.correct?'correct':answers[i]===j?'wrong':''}" data-question="${i}" data-answer="${j}" ${answers[i]!==null?'disabled':''}>${a}</button>`).join('')}</div><div class="feedback" aria-live="polite">${answers[i]===null?'':(answers[i]===item.correct?'Correct. ':'Not quite. ')+item.why}</div></section>`).join('');document.querySelectorAll('[data-question]').forEach(b=>b.addEventListener('click',()=>{answers[+b.dataset.question]=+b.dataset.answer;renderQuiz()}));const score=answers.reduce((s,a,i)=>s+(a===quiz[i].correct),0);$('score-text').textContent=`Score: ${score} / ${quiz.length}`}
+    $('reset-quiz').addEventListener('click',()=>{answers.fill(null);renderQuiz()});renderQuiz();
+  </script>
+</body>
+</html>
