@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Mutual Information Explorer — CS 473</title>
+  <meta name="description" content="Explore mutual information, conditional mutual information, data processing, and sufficient statistics interactively.">
+  <style>
+    :root{color-scheme:light dark;--bg:light-dark(#f5f7fb,#0c1119);--panel:light-dark(#fff,#171e2a);--panel2:light-dark(#edf2f8,#222b3a);--text:light-dark(#182133,#edf3ff);--muted:light-dark(#5d687b,#aab6cb);--line:light-dark(#d8e0eb,#354052);--blue:light-dark(#225fd3,#78a8ff);--orange:light-dark(#b95b12,#ff9d57);--green:light-dark(#17785a,#53d3a2);--red:light-dark(#b6404d,#ff7b88);--purple:light-dark(#7951c6,#bd9aff);--shadow:0 12px 34px light-dark(#22304a14,#00000038)}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 8% 0,light-dark(#e4eeff,#142039) 0,transparent 34%),var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}.shell{width:min(1120px,calc(100% - 28px));margin:auto;padding:30px 0 52px}.crumbs{display:flex;gap:8px;color:var(--muted);font-size:.9rem;margin-bottom:26px}.crumbs a{color:inherit;text-decoration:none}.crumbs a:hover{text-decoration:underline}.eyebrow{text-transform:uppercase;letter-spacing:.13em;color:var(--blue);font-size:.75rem;font-weight:700}h1{font-size:clamp(2.25rem,5vw,4.25rem);letter-spacing:-.055em;line-height:1;margin:.25rem 0 .75rem}.lede{max-width:840px;color:var(--muted);font-size:1.04rem;margin:0 0 20px}.key-idea{border-left:3px solid var(--orange);background:var(--panel2);padding:10px 13px;border-radius:0 10px 10px 0;margin-bottom:20px;font-size:.9rem}.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}.tab{border:1px solid var(--line);background:var(--panel);color:var(--text);padding:10px 14px;border-radius:10px;cursor:pointer}.tab[aria-selected="true"]{background:var(--text);color:var(--bg);border-color:var(--text)}.tab-panel[hidden]{display:none}.panel{background:var(--panel);border:1px solid var(--line);border-radius:17px;box-shadow:var(--shadow)}.lab-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(310px,.75fr);gap:16px}.lab-grid>*,.process-layout>*,.stat-layout>*{min-width:0}.main-panel,.side,.process-panel,.stat-panel{padding:18px}.section-head{display:flex;justify-content:space-between;gap:12px;align-items:baseline;margin-bottom:10px}.section-head h2,.side h2,.quiz h2{font-size:1.2rem;margin:0}.section-head span,.sub{color:var(--muted);font-size:.82rem}.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin:12px 0 16px}.controls label{display:grid;gap:4px;color:var(--muted);font-size:.8rem}.controls select{min-width:180px}.controls select,.controls input[type=range]{accent-color:var(--orange)}select{background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:9px;padding:9px}.range-wrap{min-width:220px;flex:1}.range-line{display:flex;justify-content:space-between;gap:12px}.matrix-wrap{overflow-x:auto;max-width:100%}.matrix{display:grid;grid-template-columns:78px repeat(3,minmax(64px,1fr));gap:7px;min-width:360px;align-items:stretch}.matrix.five{grid-template-columns:70px repeat(5,minmax(52px,1fr));min-width:430px}.cell{min-height:72px;border-radius:10px;background:var(--panel2);display:grid;place-items:center;text-align:center;padding:7px;position:relative}.cell.data{background:color-mix(in srgb,var(--blue) calc(8% + var(--strength)*62%),var(--panel));border:1px solid color-mix(in srgb,var(--blue) 30%,var(--line))}.cell .value{font-size:1rem;font-weight:700;font-variant-numeric:tabular-nums}.cell small{color:var(--muted)}.header-cell{min-height:42px;color:var(--muted);font-size:.78rem}.metric-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:14px}.metric{background:var(--panel2);border-radius:11px;padding:11px}.metric span{display:block;font-size:.72rem;color:var(--muted)}.metric strong{display:block;font-size:1.2rem;font-variant-numeric:tabular-nums}.message{margin-top:14px;padding:12px;border-left:3px solid var(--blue);background:var(--panel2);border-radius:0 10px 10px 0;font-size:.88rem;color:var(--muted)}.message strong{color:var(--text)}.formula-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}.formula{padding:14px}.formula b{display:block;font-size:.84rem;margin-bottom:4px}.formula code{display:block;color:var(--blue);font-size:.86rem;white-space:normal}.formula p{font-size:.78rem;color:var(--muted);margin:5px 0 0}.process-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,.7fr);gap:16px}.chain{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:10px;align-items:center;margin:28px 0}.node{background:var(--panel2);border-radius:14px;padding:18px 10px;text-align:center}.node strong{display:block;font-size:1.35rem}.node small{color:var(--muted)}.arrow{text-align:center;color:var(--orange);font-size:1.5rem}.arrow small{display:block;color:var(--muted);font-size:.7rem}.info-bars{display:grid;gap:13px;margin-top:18px}.bar-row{display:grid;grid-template-columns:115px 1fr 70px;gap:9px;align-items:center;font-size:.82rem}.track{height:14px;background:var(--panel2);border-radius:99px;overflow:hidden}.fill{height:100%;background:var(--blue);transition:width .18s ease}.fill.second{background:var(--purple)}.inequality{margin-top:15px;text-align:center;background:var(--panel2);border-radius:12px;padding:13px;font-size:1.05rem}.inequality.good{color:var(--green)}.stat-layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(290px,.9fr);gap:16px}.coin-row{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.coin{width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--panel2);color:var(--text);font-weight:700;cursor:pointer}.coin.head{background:var(--orange);color:light-dark(#fff,#17100a);border-color:var(--orange)}.sequence-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.sequence{background:var(--panel2);border-radius:11px;padding:12px}.sequence code{color:var(--blue)}.likelihood{font-variant-numeric:tabular-nums;font-size:1.15rem;font-weight:700}.sufficiency-flow{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:20px}.flow-node{background:var(--panel2);border-radius:11px;padding:10px 14px;text-align:center}.flow-arrow{color:var(--orange)}.quiz{max-width:820px;margin:auto}.quiz-intro{color:var(--muted);margin:5px 0 18px}.question{padding:18px;margin-bottom:12px}.question h3{font-size:1rem;margin:0 0 10px}.options{display:grid;gap:7px}.option{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:10px 12px;border-radius:9px;text-align:left;cursor:pointer}.option:hover{border-color:var(--blue)}.option.correct{border-color:var(--green);background:color-mix(in srgb,var(--green) 12%,var(--panel))}.option.wrong{border-color:var(--red);background:color-mix(in srgb,var(--red) 10%,var(--panel))}.feedback{min-height:24px;font-size:.85rem;color:var(--muted);margin-top:8px}.score{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:16px;margin-top:14px}.reset{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:9px 13px;border-radius:9px;cursor:pointer}.footer-note{text-align:center;color:var(--muted);font-size:.79rem;margin-top:18px}@media(max-width:820px){.lab-grid,.process-layout,.stat-layout{grid-template-columns:minmax(0,1fr)}.formula-grid{grid-template-columns:1fr}}@media(max-width:560px){.shell{width:min(100% - 18px,1120px);padding-top:20px}.main-panel,.side,.process-panel,.stat-panel,.question{padding:14px}.tabs{display:grid;grid-template-columns:1fr}.metric-grid{grid-template-columns:1fr 1fr}.chain{grid-template-columns:1fr}.arrow{transform:rotate(90deg)}.sequence-pair{grid-template-columns:1fr}.bar-row{grid-template-columns:95px 1fr 58px}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><a href="../">CS 473</a><span>›</span><span>Mutual information</span></nav>
+    <div class="eyebrow">Information theory</div>
+    <h1>Mutual Information Explorer</h1>
+    <p class="lede">See how much knowing one variable reduces uncertainty about another, then test conditional MI, the data processing inequality, and sufficient statistics.</p>
+    <div class="key-idea"><strong>Core idea:</strong> mutual information is information shared by two variables. It is zero exactly when they are independent, and it can detect nonlinear dependence that ordinary correlation misses.</div>
+
+    <div class="tabs" role="tablist" aria-label="Explorer sections">
+      <button class="tab" role="tab" aria-selected="true" aria-controls="mi-panel" id="mi-tab">MI laboratory</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="process-panel" id="process-tab">Data processing</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="stat-panel" id="stat-tab">Sufficient statistics</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="quiz-panel" id="quiz-tab">Knowledge check</button>
+    </div>
+
+    <section id="mi-panel" class="tab-panel" role="tabpanel" aria-labelledby="mi-tab">
+      <div class="lab-grid">
+        <div class="panel main-panel">
+          <div class="section-head"><h2>Joint-distribution map</h2><span>Darker cells are more likely</span></div>
+          <div class="matrix-wrap"><div id="joint-matrix" class="matrix"></div></div>
+        </div>
+        <aside class="panel side">
+          <h2>Change the relationship</h2>
+          <div class="controls">
+            <label>Pattern<select id="pattern"><option value="independent">Independent</option><option value="linear" selected>Linear</option><option value="nonlinear">Nonlinear U-shape</option></select></label>
+            <label class="range-wrap"><span class="range-line"><span>Signal strength</span><strong id="strength-value">80%</strong></span><input id="strength" type="range" min="0" max="100" value="80" step="1"></label>
+          </div>
+          <div class="metric-grid" aria-live="polite">
+            <div class="metric"><span>Mutual information</span><strong id="mi-value">—</strong></div>
+            <div class="metric"><span>Pearson correlation</span><strong id="corr-value">—</strong></div>
+            <div class="metric"><span>H(Y)</span><strong id="hy-value">—</strong></div>
+            <div class="metric"><span>H(Y|X)</span><strong id="cond-value">—</strong></div>
+          </div>
+          <div class="message" id="mi-message"></div>
+        </aside>
+      </div>
+      <div class="formula-grid">
+        <div class="panel formula"><b>Definition</b><code>I(X;Y)=Σ p(x,y) log₂[p(x,y)/(p(x)p(y))]</code><p>How different the joint distribution is from independence.</p></div>
+        <div class="panel formula"><b>Uncertainty reduction</b><code>I(X;Y)=H(Y)−H(Y|X)=H(X)+H(Y)−H(X,Y)</code><p>Bits of uncertainty about Y removed by knowing X.</p></div>
+        <div class="panel formula"><b>Conditional MI</b><code>I(X;Y|Z)=H(Y|Z)−H(Y|X,Z)</code><p>Shared information left after Z is already known.</p></div>
+      </div>
+    </section>
+
+    <section id="process-panel" class="tab-panel" role="tabpanel" aria-labelledby="process-tab" hidden>
+      <div class="process-layout">
+        <div class="panel process-panel">
+          <div class="section-head"><h2>Send one bit through two noisy steps</h2><span>X → Z → Y is a Markov chain</span></div>
+          <div class="chain" aria-label="Markov chain X to Z to Y">
+            <div class="node"><strong>X</strong><small>original bit</small></div><div class="arrow">→<small id="flip1-label">10% flip</small></div><div class="node"><strong>Z</strong><small>first copy</small></div><div class="arrow">→<small id="flip2-label">20% flip</small></div><div class="node"><strong>Y</strong><small>final copy</small></div>
+          </div>
+          <div class="controls">
+            <label class="range-wrap"><span class="range-line"><span>Noise X → Z</span><strong id="flip1-value">10%</strong></span><input id="flip1" type="range" min="0" max="50" value="10"></label>
+            <label class="range-wrap"><span class="range-line"><span>Noise Z → Y</span><strong id="flip2-value">20%</strong></span><input id="flip2" type="range" min="0" max="50" value="20"></label>
+          </div>
+          <div class="info-bars">
+            <div class="bar-row"><span>I(X;Z)</span><div class="track"><div id="bar-xz" class="fill"></div></div><strong id="ixz">—</strong></div>
+            <div class="bar-row"><span>I(X;Y)</span><div class="track"><div id="bar-xy" class="fill second"></div></div><strong id="ixy">—</strong></div>
+          </div>
+          <div class="inequality good" id="dpi-result">I(X;Y) ≤ I(X;Z)</div>
+        </div>
+        <aside class="panel side">
+          <h2>What the inequality says</h2>
+          <div class="message"><strong>Data processing inequality:</strong> processing cannot create new information about the original variable. The final copy Y cannot know more about X than the intermediate copy Z did.</div>
+          <div class="formula-grid" style="grid-template-columns:1fr">
+            <div class="formula"><b>Markov condition</b><code>p(y|x,z)=p(y|z)</code><p>Once Z is known, X gives no extra help for predicting Y.</p></div>
+            <div class="formula"><b>Inequality</b><code>X → Z → Y ⇒ I(X;Y) ≤ I(X;Z)</code><p>Equality is possible only when the processing loses no relevant information.</p></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="stat-panel" class="tab-panel" role="tabpanel" aria-labelledby="stat-tab" hidden>
+      <div class="stat-layout">
+        <div class="panel stat-panel">
+          <div class="section-head"><h2>Compress five coin flips</h2><span>Click a coin to change H or T</span></div>
+          <p class="sub">For estimating the coin bias θ, the order of flips does not matter. Only the number of heads matters.</p>
+          <div class="coin-row" id="coins" aria-label="Five editable coin flips"></div>
+          <div class="controls"><label class="range-wrap"><span class="range-line"><span>Hypothesized head probability θ</span><strong id="theta-value">0.60</strong></span><input id="theta" type="range" min="1" max="99" value="60"></label></div>
+          <div class="metric-grid" aria-live="polite">
+            <div class="metric"><span>Raw observation X</span><strong id="raw-seq">—</strong></div>
+            <div class="metric"><span>Statistic T(X)=# heads</span><strong id="head-count">—</strong></div>
+          </div>
+          <div class="sequence-pair">
+            <div class="sequence"><small>Your sequence</small><br><code id="sequence-a">—</code><br><span class="likelihood" id="like-a">—</span></div>
+            <div class="sequence"><small>Reordered, same head count</small><br><code id="sequence-b">—</code><br><span class="likelihood" id="like-b">—</span></div>
+          </div>
+          <div class="message" id="stat-message"></div>
+        </div>
+        <aside class="panel side">
+          <h2>Sufficiency in one picture</h2>
+          <div class="sufficiency-flow"><div class="flow-node">Parameter<br><strong>θ</strong></div><span class="flow-arrow">→</span><div class="flow-node">Full data<br><strong>X</strong></div><span class="flow-arrow">→</span><div class="flow-node">Summary<br><strong>T(X)</strong></div></div>
+          <div class="message"><strong>A sufficient statistic</strong> keeps all information in the data that matters for the parameter. For Bernoulli trials, the number of heads is sufficient for θ.</div>
+          <div class="formula-grid" style="grid-template-columns:1fr">
+            <div class="formula"><b>Likelihood</b><code>p(x|θ)=θʰ(1−θ)ⁿ⁻ʰ</code><p>Every sequence with h heads has the same likelihood.</p></div>
+            <div class="formula"><b>Information view</b><code>I(θ;X)=I(θ;T(X))</code><p>The summary loses no information about θ, even though it discards order.</p></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="quiz-panel" class="tab-panel quiz" role="tabpanel" aria-labelledby="quiz-tab" hidden>
+      <h2>Check your understanding</h2>
+      <p class="quiz-intro">Choose one answer for each question. Feedback appears immediately.</p>
+      <div id="questions"></div>
+      <div class="panel score"><strong id="score-text">Score: 0 / 5</strong><button class="reset" id="reset-quiz" type="button">Reset quiz</button></div>
+    </section>
+    <p class="footer-note">All information quantities use base-2 logarithms and are measured in bits.</p>
+  </main>
+
+  <script>
+    const $=id=>document.getElementById(id);
+    document.querySelectorAll('.tab').forEach(tab=>tab.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',String(t===tab)));document.querySelectorAll('.tab-panel').forEach(p=>p.hidden=p.id!==tab.getAttribute('aria-controls'))}));
+    const log2=x=>Math.log(x)/Math.log(2),entropy=p=>-p.reduce((s,v)=>s+(v>0?v*log2(v):0),0);
+    function metrics(joint,xVals,yVals){const rows=xVals.length,cols=yVals.length,px=Array(rows).fill(0),py=Array(cols).fill(0);for(let i=0;i<rows;i++)for(let j=0;j<cols;j++){px[i]+=joint[i][j];py[j]+=joint[i][j]}let mi=0,ex=0,ey=0,ex2=0,ey2=0,exy=0;for(let i=0;i<rows;i++)for(let j=0;j<cols;j++){const p=joint[i][j];if(p>0)mi+=p*log2(p/(px[i]*py[j]));ex+=p*xVals[i];ey+=p*yVals[j];ex2+=p*xVals[i]**2;ey2+=p*yVals[j]**2;exy+=p*xVals[i]*yVals[j]}const vx=ex2-ex**2,vy=ey2-ey**2,corr=vx>1e-12&&vy>1e-12?(exy-ex*ey)/Math.sqrt(vx*vy):0;return{mi,corr,hy:entropy(py),cond:entropy(py)-mi,px,py}}
+    const xVals=[-2,-1,0,1,2],yVals=[0,1,2];
+    function dependentJoint(pattern){const j=Array.from({length:5},()=>Array(3).fill(0));if(pattern==='linear'){for(let i=0;i<5;i++){const y=i<2?0:i===2?1:2;j[i][y]=.2}}else if(pattern==='nonlinear'){for(let i=0;i<5;i++)j[i][Math.abs(xVals[i])]=.2}else{for(let i=0;i<5;i++)for(let k=0;k<3;k++)j[i][k]=1/15}return j}
+    function mixJoint(base,a){const px=base.map(r=>r.reduce((s,v)=>s+v,0)),py=[0,0,0];base.forEach(r=>r.forEach((v,j)=>py[j]+=v));return base.map((r,i)=>r.map((v,j)=>a*v+(1-a)*px[i]*py[j]))}
+    function renderMI(){const pattern=$('pattern').value,a=+$('strength').value/100,base=dependentJoint(pattern),joint=pattern==='independent'?base:mixJoint(base,a),m=metrics(joint,xVals,yVals);$('strength-value').textContent=Math.round(a*100)+'%';let html='<div class="cell header-cell">Y ↓ / X →</div>'+xVals.map(x=>`<div class="cell header-cell">${x}</div>`).join('');for(let y=0;y<3;y++){html+=`<div class="cell header-cell">Y=${y}</div>`;for(let x=0;x<5;x++){const p=joint[x][y];html+=`<div class="cell data" style="--strength:${Math.min(1,p/.2)}"><span class="value">${p.toFixed(3)}</span><small>p(${xVals[x]},${y})</small></div>`}}$('joint-matrix').className='matrix five';$('joint-matrix').innerHTML=html;$('mi-value').textContent=m.mi.toFixed(3)+' bits';$('corr-value').textContent=m.corr.toFixed(3);$('hy-value').textContent=m.hy.toFixed(3)+' bits';$('cond-value').textContent=m.cond.toFixed(3)+' bits';let msg;if(pattern==='independent'||a===0)msg='<strong>Independent:</strong> every row has the same Y pattern. Knowing X does not change the distribution of Y, so MI and correlation are both zero.';else if(pattern==='nonlinear')msg='<strong>Nonlinear dependence:</strong> Y follows |X|. Pearson correlation is near zero because the left and right slopes cancel, but MI still detects the dependence.';else msg='<strong>Shared information:</strong> larger X usually means larger Y. As signal strength rises, H(Y|X) falls and MI rises.';$('mi-message').innerHTML=msg}
+    $('pattern').addEventListener('change',e=>{if(e.target.value==='independent')$('strength').value=0;else if(+$('strength').value===0)$('strength').value=80;renderMI()});$('strength').addEventListener('input',renderMI);renderMI();
+    function hb(p){return entropy([p,1-p])}
+    function renderProcess(){const e1=+$('flip1').value/100,e2=+$('flip2').value/100,e=e1+e2-2*e1*e2,ixz=1-hb(e1),ixy=1-hb(e);$('flip1-value').textContent=$('flip1-label').textContent=Math.round(e1*100)+'% flip';$('flip2-value').textContent=$('flip2-label').textContent=Math.round(e2*100)+'% flip';$('ixz').textContent=ixz.toFixed(3)+' bits';$('ixy').textContent=ixy.toFixed(3)+' bits';$('bar-xz').style.width=(ixz*100)+'%';$('bar-xy').style.width=(ixy*100)+'%';$('dpi-result').textContent=`${ixy.toFixed(3)} ≤ ${ixz.toFixed(3)} bits — processing did not create information`}
+    $('flip1').addEventListener('input',renderProcess);$('flip2').addEventListener('input',renderProcess);renderProcess();
+    let coins=['H','T','H','H','T'];
+    function reordered(c){const h=c.filter(x=>x==='H').length;return Array(h).fill('H').concat(Array(c.length-h).fill('T'))}
+    function renderStats(){const theta=+$('theta').value/100,h=coins.filter(x=>x==='H').length,n=coins.length,like=theta**h*(1-theta)**(n-h),seq=coins.join(''),other=reordered(coins).join('');$('coins').innerHTML=coins.map((v,i)=>`<button type="button" class="coin ${v==='H'?'head':''}" data-coin="${i}" aria-label="Flip ${i+1}: ${v==='H'?'heads':'tails'}">${v}</button>`).join('');document.querySelectorAll('[data-coin]').forEach(b=>b.addEventListener('click',()=>{const i=+b.dataset.coin;coins[i]=coins[i]==='H'?'T':'H';renderStats()}));$('theta-value').textContent=theta.toFixed(2);$('raw-seq').textContent=seq;$('head-count').textContent=h;$('sequence-a').textContent=seq;$('sequence-b').textContent=other;$('like-a').textContent=$('like-b').textContent=like.toFixed(5);$('stat-message').innerHTML=`<strong>Same likelihood:</strong> both sequences contain ${h} heads and ${n-h} tails, so both have probability θ<sup>${h}</sup>(1−θ)<sup>${n-h}</sup> under the model. The order can be discarded when learning θ.`}
+    $('theta').addEventListener('input',renderStats);renderStats();
+    const quiz=[
+      {q:'When is I(X;Y) exactly zero?',a:['When X and Y have equal entropy','When X and Y are independent','When their Pearson correlation is positive'],correct:1,why:'MI is KL(p(x,y) ‖ p(x)p(y)), so it is zero exactly when the joint distribution factors into the marginals.'},
+      {q:'If Y=|X|, Pearson correlation can be zero while MI is positive. Why?',a:['MI can detect nonlinear dependence','MI ignores the joint distribution','Correlation is always larger than MI'],correct:0,why:'Pearson correlation measures linear association. MI detects any statistical dependence.'},
+      {q:'What does I(X;Y|Z) measure?',a:['Shared information between X and Y after Z is known','Only the entropy of Z','The correlation between X and Z'],correct:0,why:'Conditional MI asks whether X still reduces uncertainty about Y once Z is already available.'},
+      {q:'For X → Z → Y, which statement must hold?',a:['I(X;Y) ≥ I(X;Z)','I(X;Y) = 0','I(X;Y) ≤ I(X;Z)'],correct:2,why:'The data processing inequality says downstream processing cannot create information about X.'},
+      {q:'For n Bernoulli trials with unknown θ, which statistic is sufficient?',a:['The order of flips','The number of heads','The first flip only'],correct:1,why:'The likelihood depends on the data only through the head count, so that count preserves all information about θ.'}
+    ];let answers=Array(quiz.length).fill(null);
+    function renderQuiz(){$('questions').innerHTML=quiz.map((item,i)=>`<section class="panel question"><h3>${i+1}. ${item.q}</h3><div class="options">${item.a.map((a,j)=>`<button class="option ${answers[i]===null?'':j===item.correct?'correct':answers[i]===j?'wrong':''}" data-question="${i}" data-answer="${j}" ${answers[i]!==null?'disabled':''}>${a}</button>`).join('')}</div><div class="feedback" aria-live="polite">${answers[i]===null?'':(answers[i]===item.correct?'Correct. ':'Not quite. ')+item.why}</div></section>`).join('');document.querySelectorAll('[data-question]').forEach(b=>b.addEventListener('click',()=>{answers[+b.dataset.question]=+b.dataset.answer;renderQuiz()}));const score=answers.reduce((s,a,i)=>s+(a===quiz[i].correct),0);$('score-text').textContent=`Score: ${score} / ${quiz.length}`}
+    $('reset-quiz').addEventListener('click',()=>{answers.fill(null);renderQuiz()});renderQuiz();
+  </script>
+</body>
+</html>
