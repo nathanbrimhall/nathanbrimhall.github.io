@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>MM &amp; EM Bound Explorer — CS 473</title>
+  <meta name="description" content="Step through bound optimization, the EM algorithm, and EM for a Gaussian mixture model.">
+  <style>
+    :root{color-scheme:light dark;--bg:light-dark(#f5f7fb,#0c1119);--panel:light-dark(#fff,#171e2a);--panel2:light-dark(#edf2f8,#222b3a);--text:light-dark(#182133,#edf3ff);--muted:light-dark(#5d687b,#aab6cb);--line:light-dark(#d8e0eb,#354052);--blue:light-dark(#245fd3,#79a8ff);--orange:light-dark(#bb5c11,#ff9d57);--green:light-dark(#17785a,#53d3a2);--red:light-dark(#b6404d,#ff7b88);--purple:light-dark(#7850c5,#bd9aff);--shadow:0 12px 34px light-dark(#22304a14,#00000038)}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 8% 0,light-dark(#e5eeff,#142039) 0,transparent 34%),var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}.shell{width:min(1120px,calc(100% - 28px));margin:auto;padding:30px 0 52px}.crumbs{display:flex;gap:8px;color:var(--muted);font-size:.9rem;margin-bottom:26px}.crumbs a{color:inherit;text-decoration:none}.crumbs a:hover{text-decoration:underline}.eyebrow{text-transform:uppercase;letter-spacing:.13em;color:var(--blue);font-size:.75rem;font-weight:700}h1{font-size:clamp(2.25rem,5vw,4.25rem);letter-spacing:-.055em;line-height:1;margin:.25rem 0 .75rem}.lede{max-width:850px;color:var(--muted);font-size:1.04rem;margin:0 0 20px}.key-idea{border-left:3px solid var(--orange);background:var(--panel2);padding:10px 13px;border-radius:0 10px 10px 0;margin-bottom:20px;font-size:.9rem}.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}.tab{border:1px solid var(--line);background:var(--panel);color:var(--text);padding:10px 14px;border-radius:10px;cursor:pointer}.tab[aria-selected="true"]{background:var(--text);color:var(--bg);border-color:var(--text)}.tab-panel[hidden]{display:none}.panel{background:var(--panel);border:1px solid var(--line);border-radius:17px;box-shadow:var(--shadow)}.work-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.65fr);gap:16px}.work-grid>*{min-width:0}.plot-panel,.side,.history-panel{padding:18px}.section-head{display:flex;justify-content:space-between;gap:12px;align-items:baseline;margin-bottom:8px}.section-head h2,.side h2,.quiz h2{font-size:1.2rem;margin:0}.section-head span,.sub{color:var(--muted);font-size:.8rem}.chart{display:block;width:100%;height:auto;min-height:300px}.gridline{stroke:var(--line);stroke-width:1;opacity:.55}.axis{stroke:var(--line);stroke-width:1.2}.axis-text{fill:var(--muted);font-size:11px}.axis-title{fill:var(--text);font-size:12px}.objective-line{fill:none;stroke:var(--blue);stroke-width:3}.bound-line{fill:none;stroke:var(--orange);stroke-width:3;stroke-dasharray:8 6}.current-dot{fill:var(--blue);stroke:var(--panel);stroke-width:3}.proposal-dot{fill:var(--orange);stroke:var(--panel);stroke-width:3}.guide{stroke:var(--muted);stroke-width:1;stroke-dasharray:4 4}.legend{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:.8rem;margin-top:5px}.key{display:inline-block;width:18px;height:3px;margin:0 6px 3px 0}.key.objective{background:var(--blue)}.key.bound{background:var(--orange)}.controls{display:grid;gap:10px;margin:12px 0}.controls label{display:grid;gap:4px;color:var(--muted);font-size:.8rem}select{width:100%;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:9px;padding:9px}.button-row{display:flex;flex-wrap:wrap;gap:8px}.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:10px 13px;border-radius:9px;cursor:pointer}.btn.primary{background:var(--text);color:var(--bg);border-color:var(--text)}.btn:hover{border-color:var(--blue)}.step-card{margin-top:14px;background:var(--panel2);border-left:3px solid var(--orange);border-radius:0 10px 10px 0;padding:12px}.step-card strong{display:block;margin-bottom:3px}.step-card p{margin:0;color:var(--muted);font-size:.86rem}.metric-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:14px}.metric{background:var(--panel2);border-radius:11px;padding:11px}.metric span{display:block;font-size:.72rem;color:var(--muted)}.metric strong{display:block;font-size:1.15rem;font-variant-numeric:tabular-nums}.formula-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}.formula{padding:14px}.formula b{display:block;font-size:.84rem;margin-bottom:4px}.formula code{display:block;color:var(--blue);font-size:.85rem;white-space:normal}.formula p{font-size:.78rem;color:var(--muted);margin:5px 0 0}.em-layout{display:grid;gap:16px}.em-bottom{display:grid;grid-template-columns:minmax(0,1fr) minmax(290px,.65fr);gap:16px}.em-bottom>*{min-width:0}.density-total{fill:none;stroke:var(--text);stroke-width:3}.density-one{fill:none;stroke:var(--blue);stroke-width:2}.density-two{fill:none;stroke:var(--orange);stroke-width:2}.mean-line-one{stroke:var(--blue);stroke-width:2;stroke-dasharray:5 4}.mean-line-two{stroke:var(--orange);stroke-width:2;stroke-dasharray:5 4}.history-line{fill:none;stroke:var(--green);stroke-width:3}.history-dot{fill:var(--green)}.history-chart{display:block;width:100%;height:auto;min-height:170px}.gap-track{height:14px;background:var(--panel2);border-radius:99px;overflow:hidden;margin-top:7px}.gap-fill{height:100%;background:var(--purple);transition:width .18s ease}.equation-now{background:var(--panel2);border-radius:11px;padding:11px;margin-top:12px;color:var(--muted);font-size:.82rem}.equation-now code{color:var(--blue)}.quiz{max-width:820px;margin:auto}.quiz-intro{color:var(--muted);margin:5px 0 18px}.question{padding:18px;margin-bottom:12px}.question h3{font-size:1rem;margin:0 0 10px}.options{display:grid;gap:7px}.option{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:10px 12px;border-radius:9px;text-align:left;cursor:pointer}.option:hover{border-color:var(--blue)}.option.correct{border-color:var(--green);background:color-mix(in srgb,var(--green) 12%,var(--panel))}.option.wrong{border-color:var(--red);background:color-mix(in srgb,var(--red) 10%,var(--panel))}.feedback{min-height:24px;font-size:.85rem;color:var(--muted);margin-top:8px}.score{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:16px;margin-top:14px}.footer-note{text-align:center;color:var(--muted);font-size:.79rem;margin-top:18px}@media(max-width:820px){.work-grid,.em-bottom{grid-template-columns:minmax(0,1fr)}.formula-grid{grid-template-columns:1fr}}@media(max-width:560px){.shell{width:min(100% - 18px,1120px);padding-top:20px}.plot-panel,.side,.history-panel,.question{padding:14px}.tabs{display:grid;grid-template-columns:1fr}.metric-grid{grid-template-columns:1fr 1fr}.section-head{align-items:flex-start;flex-direction:column}.chart{min-height:0}.score{align-items:flex-start;flex-direction:column}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><a href="../">CS 473</a><span>›</span><span>MM and EM</span></nav>
+    <div class="eyebrow">Bound optimization</div>
+    <h1>MM &amp; EM Bound Explorer</h1>
+    <p class="lede">Advance one step at a time to see a lower bound touch the objective, move uphill, and become tight again. Then repeat the same logic inside a Gaussian mixture model.</p>
+    <div class="key-idea"><strong>The pattern:</strong> build an easier bound at the current estimate, optimize that bound, and repeat. EM is this pattern applied to hidden variables.</div>
+
+    <div class="tabs" role="tablist" aria-label="Explorer sections">
+      <button class="tab" role="tab" aria-selected="true" aria-controls="mm-panel" id="mm-tab">Generic MM</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="em-panel" id="em-tab">EM for a GMM</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="quiz-panel" id="quiz-tab">Knowledge check</button>
+    </div>
+
+    <section id="mm-panel" class="tab-panel" role="tabpanel" aria-labelledby="mm-tab">
+      <div class="work-grid">
+        <div class="panel plot-panel">
+          <div class="section-head"><h2>Climb a difficult objective using an easy bound</h2><span>Maximization: minorize, then maximize</span></div>
+          <svg id="mm-chart" class="chart" viewBox="0 0 720 370" role="img" aria-label="Objective function, lower bound, current estimate, and proposed MM update"></svg>
+          <div class="legend"><span><i class="key objective"></i>Objective f(θ)</span><span><i class="key bound"></i>Lower bound g(θ | θₜ)</span></div>
+        </div>
+        <aside class="panel side">
+          <h2>Control the algorithm</h2>
+          <div class="controls"><label>Starting point<select id="mm-start"><option value="left">Left basin</option><option value="middle" selected>Middle</option><option value="right">Right basin</option></select></label></div>
+          <div class="button-row"><button class="btn primary" id="mm-next" type="button">Construct bound</button><button class="btn" id="mm-full" type="button">Run full iteration</button><button class="btn" id="mm-reset" type="button">Reset</button></div>
+          <div class="step-card" aria-live="polite"><strong id="mm-step-title">Current estimate</strong><p id="mm-step-text">The algorithm begins at θ₀. The next step constructs a lower bound that touches the objective here.</p></div>
+          <div class="metric-grid">
+            <div class="metric"><span>Iteration</span><strong id="mm-iteration">0</strong></div>
+            <div class="metric"><span>Current θ</span><strong id="mm-theta">0.000</strong></div>
+            <div class="metric"><span>Objective f(θ)</span><strong id="mm-objective">—</strong></div>
+            <div class="metric"><span>Last improvement</span><strong id="mm-improvement">—</strong></div>
+          </div>
+        </aside>
+      </div>
+      <div class="formula-grid">
+        <div class="panel formula"><b>Lower-bound requirement</b><code>g(θ | θₜ) ≤ f(θ)</code><p>The surrogate must stay below the objective.</p></div>
+        <div class="panel formula"><b>Tightness</b><code>g(θₜ | θₜ) = f(θₜ)</code><p>The curves touch at the current estimate.</p></div>
+        <div class="panel formula"><b>Update</b><code>θₜ₊₁ = arg maxθ g(θ | θₜ)</code><p>Maximizing the bound cannot decrease the objective.</p></div>
+      </div>
+    </section>
+
+    <section id="em-panel" class="tab-panel" role="tabpanel" aria-labelledby="em-tab" hidden>
+      <div class="em-layout">
+        <div class="work-grid">
+          <div class="panel plot-panel">
+            <div class="section-head"><h2>Two-component Gaussian mixture</h2><span>Point color shows soft responsibility</span></div>
+            <svg id="em-chart" class="chart" viewBox="0 0 720 370" role="img" aria-label="One-dimensional observations and two Gaussian mixture components"></svg>
+            <div class="legend"><span><i class="key objective"></i>Component 1</span><span><i class="key bound"></i>Component 2</span><span>Black line: mixture density</span></div>
+          </div>
+          <aside class="panel side">
+            <h2>Step through EM</h2>
+            <div class="controls"><label>Scenario<select id="em-scenario"><option value="good" selected>Separated data · good start</option><option value="poor">Separated data · poor start</option><option value="overlap">Overlapping data</option></select></label></div>
+            <div class="button-row"><button class="btn primary" id="em-next" type="button">Run E-step</button><button class="btn" id="em-full" type="button">Run full iteration</button><button class="btn" id="em-reset" type="button">Reset</button></div>
+            <div class="step-card" aria-live="polite"><strong id="em-step-title">Ready for the E-step</strong><p id="em-step-text">The parameters are fixed. Calculate how strongly each Gaussian claims each observation.</p></div>
+            <div class="metric-grid">
+              <div class="metric"><span>Iteration</span><strong id="em-iteration">0</strong></div>
+              <div class="metric"><span>Log likelihood</span><strong id="em-ll">—</strong></div>
+              <div class="metric"><span>ELBO</span><strong id="em-elbo">—</strong></div>
+              <div class="metric"><span>Likelihood − ELBO</span><strong id="em-gap">—</strong></div>
+            </div>
+            <div class="gap-track" aria-hidden="true"><div id="em-gap-bar" class="gap-fill"></div></div>
+            <div class="equation-now" id="em-equation"></div>
+          </aside>
+        </div>
+        <div class="em-bottom">
+          <div class="panel history-panel">
+            <div class="section-head"><h2>Likelihood history</h2><span>Each completed EM iteration is non-decreasing</span></div>
+            <svg id="history-chart" class="history-chart" viewBox="0 0 720 210" role="img" aria-label="Log likelihood over completed EM iterations"></svg>
+          </div>
+          <div class="panel side">
+            <h2>Current component parameters</h2>
+            <div class="metric-grid">
+              <div class="metric"><span>Mean μ₁</span><strong id="mu1">—</strong></div>
+              <div class="metric"><span>Mean μ₂</span><strong id="mu2">—</strong></div>
+              <div class="metric"><span>Std. dev. σ₁</span><strong id="sigma1">—</strong></div>
+              <div class="metric"><span>Std. dev. σ₂</span><strong id="sigma2">—</strong></div>
+              <div class="metric"><span>Weight π₁</span><strong id="pi1">—</strong></div>
+              <div class="metric"><span>Weight π₂</span><strong id="pi2">—</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="formula-grid">
+        <div class="panel formula"><b>E-step: tighten</b><code>rᵢₖ = p(zᵢ=k | xᵢ, θₜ)</code><p>Update the hidden assignments. The ELBO becomes equal to the likelihood.</p></div>
+        <div class="panel formula"><b>M-step: climb</b><code>θₜ₊₁ = arg maxθ 𝓛(q,θ)</code><p>Update weights, means, and variances while responsibilities stay fixed.</p></div>
+        <div class="panel formula"><b>Why it works</b><code>log p(X|θ) = 𝓛(q,θ) + KL(q ‖ posterior)</code><p>The nonnegative KL term is exactly the visible gap.</p></div>
+      </div>
+    </section>
+
+    <section id="quiz-panel" class="tab-panel quiz" role="tabpanel" aria-labelledby="quiz-tab" hidden>
+      <h2>Check your understanding</h2>
+      <p class="quiz-intro">Choose one answer for each question. Feedback appears immediately.</p>
+      <div id="questions"></div>
+      <div class="panel score"><strong id="score-text">Score: 0 / 5</strong><button class="btn" id="reset-quiz" type="button">Reset quiz</button></div>
+    </section>
+    <p class="footer-note">The demonstrations are deterministic, so resetting a scenario always reproduces the same path.</p>
+  </main>
+
+  <script>
+    const $=id=>document.getElementById(id);
+    document.querySelectorAll('.tab').forEach(tab=>tab.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',String(t===tab)));document.querySelectorAll('.tab-panel').forEach(p=>p.hidden=p.id!==tab.getAttribute('aria-controls'))}));
+    const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+
+    const f=x=>1.45-.055*(x-.25)**2+.27*Math.sin(1.72*x)+.09*Math.cos(3.05*x);
+    const fp=x=>-.11*(x-.25)+.4644*Math.cos(1.72*x)-.2745*Math.sin(3.05*x);
+    const L=1.8,starts={left:-3.1,middle:0,right:2.75};
+    let mmTheta=0,mmProposal=0,mmStage=0,mmIter=0,mmLast=null;
+    const lower=(x,t)=>f(t)+fp(t)*(x-t)-L*(x-t)**2/2;
+    function pathFor(fn,X,Y){let s='';for(let x=-4;x<=4.001;x+=.04)s+=(s?'L':'M')+X(x).toFixed(1)+','+Y(fn(x)).toFixed(1);return s}
+    function drawMM(){const svg=$('mm-chart'),W=720,H=370,l=55,r=18,t=24,b=48,pw=W-l-r,ph=H-t-b,xmin=-4,xmax=4,ymin=.42,ymax=1.83,X=x=>l+(x-xmin)/(xmax-xmin)*pw,Y=y=>t+ph-(y-ymin)/(ymax-ymin)*ph;let out='<title>MM bound optimization</title><desc>The blue objective is difficult. The orange quadratic lower bound touches it at the current estimate.</desc><defs><clipPath id="mm-clip"><rect x="'+l+'" y="'+t+'" width="'+pw+'" height="'+ph+'"/></clipPath></defs>';for(let i=0;i<=8;i++){const x=-4+i,px=X(x);out+=`<line class="gridline" x1="${px}" y1="${t}" x2="${px}" y2="${t+ph}"/><text class="axis-text" x="${px}" y="${H-25}" text-anchor="middle">${x}</text>`}for(let i=0;i<=4;i++){const y=ymin+i*(ymax-ymin)/4,py=Y(y);out+=`<line class="gridline" x1="${l}" y1="${py}" x2="${l+pw}" y2="${py}"/><text class="axis-text" x="${l-8}" y="${py+4}" text-anchor="end">${y.toFixed(1)}</text>`}out+=`<g clip-path="url(#mm-clip)"><path class="objective-line" d="${pathFor(f,X,Y)}"/>`;if(mmStage===1){out+=`<path class="bound-line" d="${pathFor(x=>lower(x,mmTheta),X,Y)}"/><line class="guide" x1="${X(mmProposal)}" y1="${Y(lower(mmProposal,mmTheta))}" x2="${X(mmProposal)}" y2="${t+ph}"/><circle class="proposal-dot" cx="${X(mmProposal)}" cy="${Y(lower(mmProposal,mmTheta))}" r="7"/>`}out+=`<line class="guide" x1="${X(mmTheta)}" y1="${Y(f(mmTheta))}" x2="${X(mmTheta)}" y2="${t+ph}"/><circle class="current-dot" cx="${X(mmTheta)}" cy="${Y(f(mmTheta))}" r="8"/></g><line class="axis" x1="${l}" y1="${t+ph}" x2="${l+pw}" y2="${t+ph}"/><line class="axis" x1="${l}" y1="${t}" x2="${l}" y2="${t+ph}"/><text class="axis-title" x="${l+pw/2}" y="${H-4}" text-anchor="middle">Parameter θ</text><text class="axis-title" transform="translate(15 ${t+ph/2}) rotate(-90)" text-anchor="middle">Objective value</text>`;svg.innerHTML=out;$('mm-iteration').textContent=mmIter;$('mm-theta').textContent=mmTheta.toFixed(3);$('mm-objective').textContent=f(mmTheta).toFixed(3);$('mm-improvement').textContent=mmLast===null?'—':(mmLast>=0?'+':'')+mmLast.toFixed(4);$('mm-next').textContent=mmStage===0?'Construct bound':'Maximize bound';if(mmStage===0){$('mm-step-title').textContent=mmIter?'New current estimate':'Current estimate';$('mm-step-text').textContent='The next surrogate will touch the objective at this point and stay below it.'}else{$('mm-step-title').textContent='Bound constructed';$('mm-step-text').textContent=`The orange quadratic touches at θ=${mmTheta.toFixed(3)}. Its maximum proposes θ=${mmProposal.toFixed(3)}.`}}
+    function constructMM(){mmProposal=clamp(mmTheta+fp(mmTheta)/L,-4,4);mmStage=1;drawMM()}
+    function maximizeMM(){const old=f(mmTheta);mmTheta=mmProposal;mmLast=f(mmTheta)-old;mmIter++;mmStage=0;drawMM()}
+    function resetMM(){mmTheta=starts[$('mm-start').value];mmStage=0;mmIter=0;mmLast=null;drawMM()}
+    $('mm-next').addEventListener('click',()=>mmStage===0?constructMM():maximizeMM());$('mm-full').addEventListener('click',()=>{if(mmStage===0)constructMM();maximizeMM()});$('mm-reset').addEventListener('click',resetMM);$('mm-start').addEventListener('change',resetMM);resetMM();
+
+    const separated=[-3.25,-2.9,-2.65,-2.4,-2.15,-1.9,-1.6,-1.25,1.15,1.45,1.75,2.05,2.25,2.55,2.8,3.15];
+    const overlapping=[-2.5,-2.05,-1.6,-1.2,-.8,-.45,-.1,.15,.4,.7,1.0,1.25,1.55,1.9,2.25,2.7];
+    const emStarts={good:{data:separated,p:[{pi:.5,mu:-2.3,s:.9},{pi:.5,mu:2.1,s:.9}]},poor:{data:separated,p:[{pi:.5,mu:-.45,s:2.2},{pi:.5,mu:.55,s:2.2}]},overlap:{data:overlapping,p:[{pi:.5,mu:-1.2,s:1.25},{pi:.5,mu:1.2,s:1.25}]}};
+    let emData=[],params=[],resp=[],emNext='E',emIter=0,llHistory=[];
+    const norm=(x,m,s)=>Math.exp(-.5*((x-m)/s)**2)/(s*Math.sqrt(2*Math.PI));
+    function posterior(x,p=params){const a=p[0].pi*norm(x,p[0].mu,p[0].s),b=p[1].pi*norm(x,p[1].mu,p[1].s),z=a+b;return[a/z,b/z]}
+    function logLik(p=params){return emData.reduce((sum,x)=>sum+Math.log(p[0].pi*norm(x,p[0].mu,p[0].s)+p[1].pi*norm(x,p[1].mu,p[1].s)),0)}
+    function elbo(q=resp,p=params){let v=0;emData.forEach((x,i)=>q[i].forEach((r,k)=>{if(r>0)v+=r*(Math.log(p[k].pi*norm(x,p[k].mu,p[k].s))-Math.log(r))}));return v}
+    function eStep(){resp=emData.map(x=>posterior(x));emNext='M';renderEM();$('em-step-title').textContent='E-step complete: the bound is tight';$('em-step-text').textContent='Responsibilities now equal the posterior under the current parameters, so ELBO = log likelihood.';$('em-next').textContent='Run M-step'}
+    function mStep(){const old=logLik();const n=emData.length;for(let k=0;k<2;k++){const nk=resp.reduce((s,r)=>s+r[k],0),mu=resp.reduce((s,r,i)=>s+r[k]*emData[i],0)/nk;const variance=resp.reduce((s,r,i)=>s+r[k]*(emData[i]-mu)**2,0)/nk;params[k]={pi:nk/n,mu,s:Math.sqrt(Math.max(variance,.04))}}emIter++;emNext='E';const now=logLik();llHistory.push(now);renderEM();$('em-step-title').textContent='M-step complete: the bound moved up';$('em-step-text').textContent=`Parameters were updated using weighted statistics. Log likelihood changed by ${(now-old).toFixed(4)}.`;$('em-next').textContent='Run E-step'}
+    function resetEM(){const s=emStarts[$('em-scenario').value];emData=[...s.data];params=s.p.map(x=>({...x}));resp=emData.map(()=>[.5,.5]);emNext='E';emIter=0;llHistory=[logLik()];$('em-step-title').textContent='Ready for the E-step';$('em-step-text').textContent='The parameters are fixed. Calculate how strongly each Gaussian claims each observation.';$('em-next').textContent='Run E-step';renderEM()}
+    function drawEMDensity(){const svg=$('em-chart'),W=720,H=370,l=52,r=18,t=24,b=62,pw=W-l-r,ph=H-t-b,xmin=-4.3,xmax=4.3,ymax=.48,X=x=>l+(x-xmin)/(xmax-xmin)*pw,Y=y=>t+ph-y/ymax*ph;const makePath=fn=>{let s='';for(let x=xmin;x<=xmax+.001;x+=.05)s+=(s?'L':'M')+X(x).toFixed(1)+','+Y(fn(x)).toFixed(1);return s};let out='<title>Gaussian mixture EM</title><desc>Observations are colored by responsibility while two Gaussian components move during EM.</desc>';for(let i=-4;i<=4;i++){const px=X(i);out+=`<line class="gridline" x1="${px}" y1="${t}" x2="${px}" y2="${t+ph}"/><text class="axis-text" x="${px}" y="${H-33}" text-anchor="middle">${i}</text>`}for(let i=0;i<=4;i++){const y=i*.1,py=Y(y);out+=`<line class="gridline" x1="${l}" y1="${py}" x2="${l+pw}" y2="${py}"/><text class="axis-text" x="${l-8}" y="${py+4}" text-anchor="end">${y.toFixed(1)}</text>`}out+=`<path class="density-one" d="${makePath(x=>params[0].pi*norm(x,params[0].mu,params[0].s))}"/><path class="density-two" d="${makePath(x=>params[1].pi*norm(x,params[1].mu,params[1].s))}"/><path class="density-total" d="${makePath(x=>params[0].pi*norm(x,params[0].mu,params[0].s)+params[1].pi*norm(x,params[1].mu,params[1].s))}"/><line class="mean-line-one" x1="${X(params[0].mu)}" y1="${t}" x2="${X(params[0].mu)}" y2="${t+ph}"/><line class="mean-line-two" x1="${X(params[1].mu)}" y1="${t}" x2="${X(params[1].mu)}" y2="${t+ph}"/>`;emData.forEach((x,i)=>{const y=t+ph+15+(i%2)*12,q=resp[i][0],fill=`color-mix(in srgb,var(--blue) ${(q*100).toFixed(1)}%,var(--orange))`;out+=`<circle cx="${X(x)}" cy="${y}" r="7" style="fill:${fill}" stroke="var(--panel)" stroke-width="2"><title>x=${x.toFixed(2)}, responsibilities ${q.toFixed(2)} and ${(1-q).toFixed(2)}</title></circle>`});out+=`<line class="axis" x1="${l}" y1="${t+ph}" x2="${l+pw}" y2="${t+ph}"/><line class="axis" x1="${l}" y1="${t}" x2="${l}" y2="${t+ph}"/><text class="axis-title" x="${l+pw/2}" y="${H-4}" text-anchor="middle">Observation x</text><text class="axis-title" transform="translate(14 ${t+ph/2}) rotate(-90)" text-anchor="middle">Probability density</text>`;svg.innerHTML=out}
+    function drawHistory(){const svg=$('history-chart'),W=720,H=210,l=58,r=18,t=20,b=40,pw=W-l-r,ph=H-t-b;let vals=[...llHistory],min=Math.min(...vals)-1,max=Math.max(...vals)+1;if(max-min<2){min-=1;max+=1}const X=i=>l+(vals.length===1?0:i/(vals.length-1))*pw,Y=v=>t+ph-(v-min)/(max-min)*ph;let out='<title>EM log likelihood history</title><desc>Observed-data log likelihood after each completed EM iteration.</desc>';for(let i=0;i<=3;i++){const y=min+i*(max-min)/3,py=Y(y);out+=`<line class="gridline" x1="${l}" y1="${py}" x2="${l+pw}" y2="${py}"/><text class="axis-text" x="${l-8}" y="${py+4}" text-anchor="end">${y.toFixed(1)}</text>`}let d=vals.map((v,i)=>(i?'L':'M')+X(i).toFixed(1)+','+Y(v).toFixed(1)).join(' ');out+=`<path class="history-line" d="${d}"/>`;vals.forEach((v,i)=>out+=`<circle class="history-dot" cx="${X(i)}" cy="${Y(v)}" r="5"/><text class="axis-text" x="${X(i)}" y="${H-18}" text-anchor="middle">${i}</text>`);out+=`<line class="axis" x1="${l}" y1="${t+ph}" x2="${l+pw}" y2="${t+ph}"/><line class="axis" x1="${l}" y1="${t}" x2="${l}" y2="${t+ph}"/><text class="axis-title" x="${l+pw/2}" y="${H-2}" text-anchor="middle">Completed EM iteration</text>`;svg.innerHTML=out}
+    function renderEM(){drawEMDensity();drawHistory();const ll=logLik(),lb=elbo(),gap=Math.max(0,ll-lb);$('em-iteration').textContent=emIter;$('em-ll').textContent=ll.toFixed(3);$('em-elbo').textContent=lb.toFixed(3);$('em-gap').textContent=gap.toFixed(4);$('em-gap-bar').style.width=Math.min(100,gap*18)+'%';params.forEach((p,k)=>{$('mu'+(k+1)).textContent=p.mu.toFixed(3);$('sigma'+(k+1)).textContent=p.s.toFixed(3);$('pi'+(k+1)).textContent=p.pi.toFixed(3)});$('em-equation').innerHTML=emNext==='M'?'<code>E-step:</code> q now equals the posterior, so KL = 0 and the bound touches the likelihood.':'<code>Before the E-step:</code> q may not equal the current posterior. The next E-step closes the visible gap.'}
+    $('em-next').addEventListener('click',()=>emNext==='E'?eStep():mStep());$('em-full').addEventListener('click',()=>{if(emNext==='M')mStep();else{eStep();mStep()}});$('em-reset').addEventListener('click',resetEM);$('em-scenario').addEventListener('change',resetEM);resetEM();
+
+    const quiz=[
+      {q:'For maximizing f(θ), what must a valid MM surrogate do?',a:['Stay above f everywhere','Stay below f and touch it at the current estimate','Equal f only at the global optimum'],correct:1,why:'A minorizing surrogate is a lower bound and is tight at the current estimate.'},
+      {q:'What happens during the E-step?',a:['The model parameters are discarded','The responsibilities are updated using the current parameters','The likelihood is minimized'],correct:1,why:'The E-step computes the posterior distribution over hidden assignments, making the ELBO tight.'},
+      {q:'What happens during the M-step for a GMM?',a:['Responsibilities stay fixed while mixture parameters are updated','Every point receives a hard label','The number of components must increase'],correct:0,why:'The M-step uses the current responsibilities as weights when updating π, μ, and Σ.'},
+      {q:'Why can the observed-data likelihood not decrease after a full EM iteration?',a:['The ELBO is a tight lower bound before the M-step and is increased','Every objective is convex','EM searches every possible parameter value'],correct:0,why:'The E-step makes the bound tight; the M-step raises it. The likelihood remains at least as high as the bound.'},
+      {q:'What does EM fail to guarantee?',a:['Non-decreasing likelihood','Soft assignments','Finding the global optimum'],correct:2,why:'EM can converge to different local optima depending on initialization.'}
+    ];let answers=Array(quiz.length).fill(null);
+    function renderQuiz(){$('questions').innerHTML=quiz.map((item,i)=>`<section class="panel question"><h3>${i+1}. ${item.q}</h3><div class="options">${item.a.map((a,j)=>`<button class="option ${answers[i]===null?'':j===item.correct?'correct':answers[i]===j?'wrong':''}" data-question="${i}" data-answer="${j}" ${answers[i]!==null?'disabled':''}>${a}</button>`).join('')}</div><div class="feedback" aria-live="polite">${answers[i]===null?'':(answers[i]===item.correct?'Correct. ':'Not quite. ')+item.why}</div></section>`).join('');document.querySelectorAll('[data-question]').forEach(b=>b.addEventListener('click',()=>{answers[+b.dataset.question]=+b.dataset.answer;renderQuiz()}));const score=answers.reduce((s,a,i)=>s+(a===quiz[i].correct),0);$('score-text').textContent=`Score: ${score} / ${quiz.length}`}
+    $('reset-quiz').addEventListener('click',()=>{answers.fill(null);renderQuiz()});renderQuiz();
+  </script>
+</body>
+</html>
