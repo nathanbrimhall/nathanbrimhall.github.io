@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Classifier Laboratory — CS 473</title>
+  <meta name="description" content="Explore Bernoulli and Bayesian Naive Bayes, Gaussian classifiers, logistic regression, correlated features, and missing measurements.">
+  <link rel="stylesheet" href="style.css">
+  <script src="models.js" defer></script><script src="app.js" defer></script>
+</head>
+<body>
+<main>
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><a href="/cs473/">CS 473</a><span>› Classifier laboratory</span></nav>
+  <div class="eyebrow">CHAPTER 9 · LEARN BY EXPERIMENTING</div>
+  <h1>Classifier laboratory</h1>
+  <p class="lede">Same observations. Different assumptions. Discover how a classifier turns evidence into a prediction.</p>
+  <div class="taxonomy"><div><strong>Generative</strong><span>Learn p(x | y) and p(y), then apply Bayes’ rule.</span><small>Bernoulli NB · Bayesian NB · Gaussian NB · Full Gaussian</small></div><div><strong>Discriminative</strong><span>Learn p(y | x) directly.</span><small>Logistic regression</small></div></div>
+  <p class="note">Bayesian Naive Bayes is a way of learning a Naive Bayes model while accounting for parameter uncertainty. Here, it uses Bernoulli features with Beta priors. It is also a generative classifier.</p>
+  <div class="tabs" role="tablist" aria-label="Laboratory experiments">
+    <button role="tab" id="binary-tab" aria-controls="binary-panel" aria-selected="true">01 · Binary evidence</button>
+    <button role="tab" id="continuous-tab" aria-controls="continuous-panel" aria-selected="false">02 · Continuous measurements</button>
+    <button role="tab" id="quiz-tab" aria-controls="quiz-panel" aria-selected="false">03 · Check understanding</button>
+  </div>
+  <section id="binary-panel" role="tabpanel" aria-labelledby="binary-tab">
+    <div class="section-title"><div><h2>Is this email spam?</h2><p>Compare maximum-likelihood Bernoulli NB, Bayesian Bernoulli NB, and logistic regression.</p></div><span class="tag">Fabricated data · computed models</span></div>
+    <div class="experiment"><aside class="controls">
+      <h3>Training data</h3>
+      <label for="binary-n">Examples per class <output id="binary-n-value">12</output></label><input type="range" id="binary-n" min="3" max="100" value="12">
+      <label for="binary-dependence">Relationship between features</label><select id="binary-dependence"><option value="independent">Independent within each class</option><option value="duplicate">Feature 2 copies feature 1</option></select>
+      <h3>Bayesian prior</h3><p class="hint">A separate Beta(α, β) prior for each feature probability in each class.</p>
+      <label for="prior-strength">Prior strength α + β <output id="prior-strength-value">2</output></label><input type="range" id="prior-strength" min="0.2" max="30" step="0.2" value="2">
+      <label for="prior-mean">Prior mean α / (α + β) <output id="prior-mean-value">50%</output></label><input type="range" id="prior-mean" min=".1" max=".9" step=".05" value=".5">
+      <h3>Inspect an email</h3>
+      <label for="feature-0">Feature 1: contains “free”</label><select id="feature-0"><option value="1">Present</option><option value="0">Absent</option><option value="missing">Unknown / missing</option></select>
+      <label for="feature-1">Feature 2: contains “prize”</label><select id="feature-1"><option value="1">Present</option><option value="0">Absent</option><option value="missing">Unknown / missing</option></select>
+      <button id="binary-resample" class="secondary">Generate another training sample</button>
+    </aside><div class="results">
+      <h3>Predicted probability of spam</h3><div id="binary-predictions" class="probabilities" aria-live="polite"></div>
+      <div id="binary-takeaway" class="callout" aria-live="polite"></div>
+      <h3>What did the models learn?</h3><p class="hint">Counts are observed data. The probabilities below are estimates for a feature being present.</p>
+      <div class="table-wrap"><table><caption>Training counts and fitted feature probabilities</caption><thead><tr><th>Class / feature</th><th>Present / total</th><th>MLE</th><th>Bayesian predictive</th></tr></thead><tbody id="binary-counts"></tbody></table></div>
+      <div class="walkthrough"><div class="walk-head"><h3>Follow Bayesian Naive Bayes</h3><button id="evidence-next">Next step</button></div><ol class="steps" id="evidence-steps"><li>1. Class prior</li><li>2. Feature evidence</li><li>3. Multiply</li><li>4. Normalize</li></ol><div id="evidence-detail" aria-live="polite"></div></div>
+      <details><summary>What is Bayesian about this model?</summary><p>For each class and feature, θ starts with a Beta(α, β) distribution. After k presences in n examples, θ | data ~ Beta(α + k, β + n − k). The predictive probability is (k + α) / (n + α + β). We integrate the class-conditional likelihood over these independent posteriors, then normalize the joint predictive scores across classes. Class priors here are fixed at ½ by the balanced design.</p><p>These bars show predictions, not credible intervals for θ. MLE uses k / n. Bayesian predictions use prior evidence as well as observations. With α = β = 1, the predictive estimate is Laplace smoothing; it is not the MAP estimate.</p></details>
+    </div></div>
+  </section>
+  <section id="continuous-panel" role="tabpanel" aria-labelledby="continuous-tab" hidden>
+    <div class="section-title"><div><h2>Which athlete group fits these measurements?</h2><p>Two standardized, simulated performance measurements. The class names are illustrative.</p></div><span class="tag">Blue: endurance · Orange: power</span></div>
+    <div class="experiment"><aside class="controls">
+      <label for="continuous-scenario">Data pattern</label><select id="continuous-scenario"><option value="separated">Different group means</option><option value="crossed">Same means, different correlations</option></select>
+      <label for="continuous-n">Training examples per group <output id="continuous-n-value">40</output></label><input type="range" id="continuous-n" min="8" max="150" step="1" value="40">
+      <label for="rho">Within-group correlation |ρ| <output id="rho-value">0.75</output></label><input type="range" id="rho" min="0" max=".95" step=".05" value=".75">
+      <label for="map-model">Model shown on the map</label><select id="map-model"><option value="gnb">Gaussian Naive Bayes · generative</option><option value="full">Full Gaussian · generative</option><option value="logistic">Logistic regression · discriminative</option></select>
+      <h3>Athlete to classify</h3><label for="point-x">Measurement 1 (z score) <output id="point-x-value">1.0</output></label><input type="range" id="point-x" min="-3.5" max="3.5" step=".1" value="1">
+      <label for="point-y">Measurement 2 (z score) <output id="point-y-value">1.0</output></label><input type="range" id="point-y" min="-3.5" max="3.5" step=".1" value="1">
+      <label class="check"><input type="checkbox" id="missing-y"> Measurement 2 is missing</label><p class="hint" id="missing-explanation">All models use both measurements.</p>
+      <button id="continuous-resample" class="secondary">Generate another training sample</button>
+    </aside><div class="results">
+      <h3 id="map-title">Gaussian Naive Bayes</h3>
+      <svg id="decision-map" role="img" aria-label="Training observations and model prediction regions in two dimensions"></svg>
+      <div class="legend"><span><i class="dot blue"></i>Endurance examples</span><span><i class="dot orange"></i>Power examples</span><span>◇ Selected athlete</span><span>Dashed ellipses: fitted Gaussian contours (Mahalanobis distance 1)</span><span>Solid curve: 50% decision boundary · deeper background color = more confident</span></div>
+      <div id="continuous-takeaway" class="callout" aria-live="polite"></div>
+      <h3>Predicted probability of the power group</h3><div id="continuous-predictions" class="probabilities" aria-live="polite"></div>
+      <div class="table-wrap"><table><caption>Performance on 1,000 separate simulated test examples (500 per group)</caption><thead><tr><th>Model</th><th>Test accuracy ↑</th><th>Log loss ↓</th></tr></thead><tbody id="continuous-metrics"></tbody></table></div>
+      <p class="hint">Log loss measures the quality of predicted probabilities. Confident wrong answers receive a large penalty. Results depend on the sample and data pattern; no model always wins.</p>
+      <details><summary>See the fitted distributions and equations</summary><div id="gaussian-parameters"></div><p>Gaussian NB: p(x | c) = N(x₁ | μ₁c, σ²₁c) × N(x₂ | μ₂c, σ²₂c). Its covariance off the diagonal is zero.</p><p>Full Gaussian: p(x | c) = N(x | μc, Σc). Each class learns its own covariance, so the decision boundary can be curved (quadratic discriminant analysis).</p><p>Logistic regression: p(c = 1 | x) = sigmoid(b + w₁x₁ + w₂x₂). Its boundary is linear. Here it minimizes mean logistic loss with L2 penalty λ = 0.02 on standardized features; the intercept is unpenalized.</p><p>Gaussian variances receive a small +0.01 regularizer for numerical stability. Missing-feature calculations assume the missingness mechanism adds no class information.</p></details>
+    </div></div>
+  </section>
+  <section id="quiz-panel" role="tabpanel" aria-labelledby="quiz-tab" hidden><h2>Can you explain the difference?</h2><p class="hint">Choose an answer to reveal a short explanation.</p><div id="quiz"></div><p id="quiz-score" aria-live="polite"></p><button id="quiz-reset" class="secondary">Try again</button></section>
+  <footer>CS 473 · Chapter 9 laboratory. All data are fabricated. Models are fitted in your browser; no information is uploaded.<br><a href="/cs473/">← Back to the course folder</a></footer>
+</main>
+</body></html>
