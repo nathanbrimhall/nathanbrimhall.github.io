@@ -5,14 +5,14 @@ const softplus = x => Math.max(x, 0) + Math.log1p(Math.exp(-Math.abs(x)));
 const mean = a => a.reduce((s, x) => s + x, 0) / a.length;
 const logisticLoss = (t, f) => softplus(f) - t * f;
 function makeData(noisy, flip, validation = false) {
-  const n = validation ? 17 : 16, offset = validation ? .31 : 0;
+  const n = validation ? 12 : 10, offset = validation ? .31 : 0;
   return Array.from({length:n}, (_, i) => {
     const x = (i + .5 + offset) * 10 / n;
     const noise = Math.sin((i + 1) * 19.31 + (validation ? 2.8 : .4));
     const demand = 11 + .12 * (x - 5) ** 2 + 1.7 * Math.sin(.8 * x) + (noisy ? 1.05 : .25) * noise;
     const prob = sigmoid(-1.2 + 2.2 * Math.sin(.72 * x) + .25 * (x - 5));
     const u = (Math.sin((i + 1) * 127.31 + (validation ? 17 : 0)) * 43758.5453 % 1 + 1) % 1;
-    let t = +(u < (noisy ? prob : (prob > .5 ? .87 : .13)));
+    let t = noisy ? +(u < prob) : +(prob >= .5);
     if (flip && !validation && i === 7) t = 1 - t;
     return {id:(validation?'V':'T')+(i+1), x, demand, t, y:2*t-1};
   });

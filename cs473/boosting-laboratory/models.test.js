@@ -22,4 +22,6 @@ const simple=[{x:1,demand:1,t:0,y:-1},{x:2,demand:3,t:0,y:-1},{x:3,demand:5,t:1,
 const regression=M.build('reg',simple,simple,.5,1),r=regression.rounds[0];near(regression.initial,4);near(r.tree.threshold,2.5);near(r.tree.values[0],-2);near(r.tree.values[1],2);near(r.after[0],3);
 const ada=M.build('ada',simple,simple,.5,1).rounds[0];near(ada.tree.error,0);near(ada.alpha,.5*Math.log((1-1e-12)/1e-12));near(ada.afterWeights[0],.25);
 const logit=M.build('logit',simple,simple,.5,1).rounds[0];near(logit.p[0],.5);near(logit.weights[0],.25);near(logit.targets[0],-2);near(logit.tree.values[0],-2);near(logit.after[0],-1);
+const chance=[{x:1,demand:1,t:0,y:-1},{x:1,demand:1,t:1,y:1}];const stopped=M.build('ada',chance,chance,.5,3);assert.equal(stopped.rounds.length,0);assert.match(stopped.stop,/below 0.5/);
+const harder=M.makeData(true,false),backtracked=M.build('logit',harder,M.makeData(true,false,true),2,20);assert.ok(backtracked.rounds.some(r=>r.step<2));assert.ok(backtracked.history.every((h,i)=>i===0||h.train.loss<=backtracked.history[i-1].train.loss+1e-12));
 console.log('Passed: regression leaves, weighted stump optimum, AdaBoost updates, LogitBoost leaf and loss, manual examples, validation independence.');
