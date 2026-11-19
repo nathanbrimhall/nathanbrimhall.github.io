@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore principal components, projections, scaling, and reconstruction with simulated data.">
+  <title>PCA Explorer — CS 473</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="app.js"></script>
+</head>
+<body><main>
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><a href="/cs473/">CS 473</a><span>› PCA Explorer</span></nav>
+  <div class="eyebrow">CS 473 · LEARN BY EXPERIMENTING</div>
+  <h1>Principal component analysis</h1>
+  <p class="lede">Follow PCA as it centers measurements, finds high-variance directions, compresses points, and reconstructs them.</p>
+  <p class="note">All observations are simulated measurements of manufactured parts. PCA runs on the displayed dataset in your browser. Change the data or settings to recompute every result.</p>
+
+  <section class="card controls" aria-labelledby="data-heading">
+    <div><h2 id="data-heading">Choose a data pattern</h2><p class="hint">A new deterministic sample is generated when you change these controls.</p></div>
+    <label>Pattern<select id="preset"><option value="positive">Strong positive correlation</option><option value="weak">Weak correlation</option><option value="negative">Strong negative correlation</option><option value="curved">Curved pattern (linear PCA struggles)</option></select></label>
+    <label>Measurement noise / cloud spread <output id="noise-out"></output><input id="noise" type="range" min="0.15" max="1.8" step="0.05" value="0.55"></label>
+    <label class="check"><input id="outlier" type="checkbox"> Add one unusual part</label>
+    <label class="check"><input id="standardize" type="checkbox"> Standardize length and width before PCA</label>
+    <label>Inspect observation<select id="observation"></select></label>
+    <div><button id="reset-data" class="secondary">Reset walkthrough</button></div>
+  </section>
+
+  <section class="card walkthrough" aria-labelledby="walk-heading">
+    <div class="walk-head"><div><span class="eyebrow">STEP-BY-STEP</span><h2 id="walk-heading">From measurements to components</h2><p id="step-summary" class="hint" aria-live="polite"></p></div>
+      <div class="actions"><button id="back" class="secondary">Back</button><button id="next">Next step</button><button id="reset" class="secondary">Reset</button></div></div>
+    <ol id="steps" class="steps" aria-label="PCA walkthrough steps"></ol>
+    <div class="formula-card"><div id="step-title" class="guide-label"></div><div id="equation" class="equation"></div><p id="step-explain"></p><p id="substitution" class="calculation" aria-live="polite"></p></div>
+    <div class="layout">
+      <div><h3 id="plot-title">Manufactured-part measurements</h3><svg id="scatter" viewBox="0 0 660 390" role="img" aria-label="PCA scatter plot with observations and principal directions"></svg><p id="plot-caption" class="hint"></p></div>
+      <aside class="stats" aria-label="PCA calculations"><h3>Numbers for this dataset</h3><div id="numbers"></div><div id="covariance"></div><div id="check-status" class="check-status" role="status"></div></aside>
+    </div>
+    <div class="two-col">
+      <article class="subcard"><h3>Projected scores</h3><svg id="scores" viewBox="0 0 660 170" role="img" aria-label="Observations projected onto principal component scores"></svg><p id="score-caption" class="hint"></p></article>
+      <article class="subcard"><h3>Selected part</h3><div id="selected-info" aria-live="polite"></div></article>
+    </div>
+    <div class="settings-row" id="angle-wrap"><label>Candidate direction angle <output id="angle-out"></output><input id="angle" type="range" min="0" max="179" step="1" value="25"></label><p class="hint">Rotate a unit vector v. The variance of its scores is vᵀSv. The highlighted angle is the maximum.</p></div>
+    <div class="settings-row"><label>Retained components K <output id="k-out"></output><input id="k" type="range" min="1" max="2" step="1" value="1"></label><p id="k-note" class="hint"></p></div>
+  </section>
+
+  <section class="card" aria-labelledby="scale-heading"><span class="eyebrow">A SEPARATE SCALING EXAMPLE</span><h2 id="scale-heading">The unit you choose can change PCA</h2><p class="hint">Same manufactured-part measurements; change length from centimeters to millimeters. Covariance PCA can favor the numerically larger unit. Standardizing each feature removes this unit effect.</p>
+    <div class="settings-row"><label>Length unit<select id="unit"><option value="cm">centimeters</option><option value="mm">millimeters</option></select></label><label class="check"><input id="scale-standardize" type="checkbox"> Standardize before PCA</label></div>
+    <div class="two-col"><div><svg id="scale-plot" viewBox="0 0 500 300" role="img" aria-label="PCA directions for measurements using current length unit"></svg><p id="scale-caption" class="hint"></p></div><div id="scale-details" class="callout"></div></div>
+  </section>
+
+  <section class="card" aria-labelledby="many-heading"><span class="eyebrow">MORE FEATURES</span><h2 id="many-heading">How many components should we keep?</h2><p class="hint">Six simulated sensor measurements are generated by two shared hidden factors plus noise. They are standardized before this PCA so the sensors share a common scale.</p>
+    <details><summary>Reveal how the six sensor features were generated</summary><p>For each part, draw two independent hidden factors A and B from a standard normal distribution. Sensor j is xⱼ = aⱼA + bⱼB + εⱼ, where εⱼ is independent normal noise with standard deviation 0.38. The loading pairs (aⱼ,bⱼ) are (1,.15), (.9,.25), (.8,−.15), (.1,1), (.2,.85), and (−.2,.8). Then standardize each sensor column before PCA. The two shared factors create correlations; the added noise prevents a perfectly two-dimensional dataset.</p></details>
+    <div class="layout"><div><svg id="scree" viewBox="0 0 620 300" role="img" aria-label="Scree plot showing individual and cumulative explained variance"></svg><p id="scree-caption" class="hint"></p></div>
+      <div class="stats"><label>Retained dimensions K <output id="six-k-out"></output><input id="six-k" type="range" min="1" max="6" step="1" value="2"></label>
+        <label>Variance target<select id="target"><option value="0.8">80%</option><option value="0.9" selected>90%</option><option value="0.95">95%</option></select></label>
+        <div id="six-summary"></div><div id="six-error"></div></div></div>
+    <details><summary>Why use SVD? What are the matrix shapes?</summary><p>For centered data with N rows and D features, X<sub>c</sub> is N×D. Its singular value decomposition is X<sub>c</sub> = UΣVᵀ. Columns of V are the D-dimensional principal directions; singular values sⱼ give covariance eigenvalues λⱼ = sⱼ²/(N−1). This page uses a symmetric Jacobi eigensolver on the small D×D covariance matrix; it avoids matrix inversion. Tiny negative eigenvalues from rounding are treated as zero.</p><p>For large datasets, randomized or incremental PCA can reduce computation or memory. Constant features carry no variance and standardize to zero.</p></details>
+  </section>
+
+  <section class="card" aria-labelledby="quiz-heading"><span class="eyebrow">CHECK YOUR UNDERSTANDING</span><h2 id="quiz-heading">Five quick questions</h2><div id="quiz"></div><p id="quiz-score" role="status"></p></section>
+  <footer>CS 473 · Simulated data · Calculations run in your browser.<br><a href="/cs473/">← Back to the CS 473 folder</a></footer>
+</main></body></html>
